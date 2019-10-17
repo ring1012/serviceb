@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serverb-${BUILD_TIME}
+  namespace: bigdata-demo
+  labels:
+    app: serverb
+    version: v${BUILD_TIME}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: serverb
+      version: v${BUILD_TIME}
+  template:
+    metadata:
+      labels:
+        app: serverb
+        version: v${BUILD_TIME}
+    spec:
+      containers:
+        - name: serverb
+          image: ${ORIGIN_REPO}/${REPO}:${PRE_TAG}-${BUILD_TIME}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: serverb
+  namespace: bigdata-demo
+  labels:
+    app: serverb
+    service: serverb
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+      name: http
+  selector:
+    app: serverb
+
